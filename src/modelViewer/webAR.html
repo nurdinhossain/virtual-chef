@@ -1,130 +1,122 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Markerless WebAR GLB Viewer</title>
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        .ar-button {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            z-index: 1000;
-        }
-        #debug-info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            background-color: rgba(0,0,0,0.5);
-            padding: 10px;
-            font-family: Arial, sans-serif;
-            z-index: 1000;
-        }
-    </style>
+    <title>Web AR with Three.js and Motion Tracking</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.126.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
-<a-scene webxr="optionalFeatures: hit-test, local-floor;">
-    <a-assets>
-        <a-asset-item id="model" src="test3.glb"></a-asset-item>
-    </a-assets>
-
-    <a-entity
-            id="model-entity"
-            gltf-model="#model"
-            scale="0.5 0.5 0.5"
-            position="0 0 0"
-            rotation="0 0 0"
-            visible="false"
-    ></a-entity>
-
-    <a-box position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
-    <a-sphere position="0 1.25 -5" radius="1.25" color="#EF2D5E"></a-sphere>
-    <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
-    <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
-
-    <a-entity camera look-controls position="0 1.6 0"></a-entity>
-    <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
-</a-scene>
-
-<button class="ar-button" id="ar-button">Start AR</button>
-<div id="debug-info"></div>
-
+<button id="ar-button">Start AR</button>
+<button id="move-button" style="position: absolute; bottom: 20px; left: 20px;">Move Model</button>
 <script>
-    const arButton = document.getElementById('ar-button');
-    const scene = document.querySelector('a-scene');
-    const modelEntity = document.getElementById('model-entity');
-    const debugInfo = document.getElementById('debug-info');
+    let camera, scene, renderer, loader;
+    let model;
+    let targetPosition = new THREE.Vector3(0, 0, -1);
 
-    function updateDebugInfo(message) {
-        debugInfo.innerHTML += message + '<br>';
-    }
+    function init() {
+        scene = new THREE.Scene();
+        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
 
-    updateDebugInfo('Page loaded');
-
-    arButton.addEventListener('click', activateAR);
-
-    function activateAR() {
-        updateDebugInfo('AR button clicked');
-        if (scene.is('ar-mode')) {
-            scene.exitAR();
-            arButton.textContent = 'Start AR';
-            updateDebugInfo('Exiting AR mode');
-        } else {
-            scene.enterAR().then(() => {
-                updateDebugInfo('Entered AR mode successfully');
-            }).catch((error) => {
-                updateDebugInfo('Error entering AR mode: ' + error.message);
-            });
-            arButton.textContent = 'Exit AR';
-        }
-    }
-
-    scene.addEventListener('enter-vr', function() {
-        updateDebugInfo('Entered VR/AR mode');
-        if (this.is('ar-mode')) {
-            modelEntity.setAttribute('visible', true);
-            modelEntity.setAttribute('position', '0 0 -1');
-            updateDebugInfo('AR mode detected, model made visible');
-        }
-    });
-
-    scene.addEventListener('exit-vr', function() {
-        updateDebugInfo('Exited VR/AR mode');
-        modelEntity.setAttribute('visible', false);
-    });
-
-    scene.addEventListener('click', function(event) {
-        if (scene.is('ar-mode')) {
-            const intersection = event.detail.intersection;
-            if (intersection) {
-                modelEntity.setAttribute('position', intersection.point);
-                updateDebugInfo('Model position updated');
-            }
-        }
-    });
-
-    // Check WebXR support
-    if (navigator.xr) {
-        navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
-            if (supported) {
-                updateDebugInfo('WebXR AR is supported');
-            } else {
-                updateDebugInfo('WebXR AR is not supported');
-            }
+        loader = new THREE.GLTFLoader();
+        loader.load('Dinosaur.glb', function (gltf) {
+            model = gltf.scene;
+            model.position.set(0, 0, -1); // Position the model in front of the camera
+            scene.add(model);
         });
-    } else {
-        updateDebugInfo('WebXR is not available');
+
+        const light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+        scene.add(light);
+    }
+
+    function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function animate() {
+        renderer.setAnimationLoop(render);
+    }
+
+    function moveModelToPosition(targetPosition, speed = 0.1) {
+        if (model) {
+            const direction = new THREE.Vector3().subVectors(targetPosition, model.position);
+            const distance = direction.length();
+            if (distance > 0.01) {
+                direction.normalize().multiplyScalar(speed);
+                model.position.add(direction);
+            }
+        }
+    }
+
+    function updateTargetPosition(x, y, z) {
+        targetPosition.set(x, y, z);
+    }
+
+    function render(timestamp, frame) {
+        if (frame) {
+            const pose = frame.getViewerPose(referenceSpace);
+            if (pose) {
+                const view = pose.views[0];
+                const viewMatrix = new THREE.Matrix4().fromArray(view.transform.inverse.matrix);
+
+                // Update the camera
+                camera.matrix.fromArray(viewMatrix.elements);
+                camera.matrix.decompose(camera.position, camera.quaternion, camera.scale);
+
+                // Move the model towards the target position
+                moveModelToPosition(targetPosition);
+
+                // Update the model's position relative to the camera
+                if (model) {
+                    model.position.applyMatrix4(camera.matrixWorld);
+                }
+            }
+        }
+        renderer.render(scene, camera);
+    }
+
+    init();
+    animate();
+    window.addEventListener('resize', onWindowResize, false);
+
+    let currentSession = null;
+    let referenceSpace = null;
+
+    document.getElementById('ar-button').addEventListener('click', function () {
+        if (currentSession === null) {
+            navigator.xr.requestSession('immersive-ar', {
+                requiredFeatures: ['local']
+            }).then(onSessionStarted);
+        } else {
+            currentSession.end();
+        }
+    });
+
+    document.getElementById('move-button').addEventListener('click', function () {
+        // Move the model 0.5 units to the right and 0.5 units up
+        updateTargetPosition(0.5, 0.5, -1);
+    });
+
+    function onSessionStarted(session) {
+        currentSession = session;
+        renderer.xr.setReferenceSpaceType('local');
+        renderer.xr.setSession(session);
+
+        session.requestReferenceSpace('local').then((space) => {
+            referenceSpace = space;
+            animate();
+        });
+
+        session.addEventListener('end', onSessionEnded);
+    }
+
+    function onSessionEnded() {
+        currentSession = null;
     }
 </script>
 </body>
