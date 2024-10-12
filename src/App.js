@@ -1,12 +1,22 @@
 import './App.css';
 import { TypeAnimation } from 'react-type-animation';
 import robot from "./robot.png"
+import burger from "./burger.png"
+import hotDog from "./hot-dog.png"
+import pancakes from "./pancakes.png"
+import donut from "./donut.png"
 
 function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img id="robot" src={robot} width="15%" alt="Robot" />
+        <div className="robot-container">
+          <img id="robot" src={robot} width="50%" alt="Robot" />
+          <img className="orbiting-image image1" src={burger} width="40%" alt="Burger" />
+          <img className="orbiting-image image2" src={hotDog} width="40%" alt="Hot Dog" />
+          <img className="orbiting-image image3" src={pancakes} width="40%" alt="Pancakes" />
+          <img className="orbiting-image image4" src={donut} width="40%" alt="Donut" />
+        </div>
         <TypeAnimation
           sequence={[
             () => {
@@ -28,7 +38,7 @@ function App() {
           ]}
           wrapper="span"
           speed={50}
-          style={{ fontSize: '2em', display: 'inline-block' }}
+          style={{ fontSize: '2em', display: 'inline-block', zIndex: 1 }}
           repeat={0}
         />
       </header>

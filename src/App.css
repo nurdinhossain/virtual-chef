@@ -15,10 +15,10 @@
 }
 
 .App-robot {
-  animation: App-robot-spin infinite .2s linear;
+  animation: App-robot-jump infinite .2s linear;
 }
 
-@keyframes App-robot-spin {
+@keyframes App-robot-jump {
 
   from {
 
@@ -32,4 +32,125 @@
 
   }
 
+}
+
+.robot-container {
+  position: relative;
+}
+
+.orbiting-image {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.image1 {
+  top: -45%;
+  left: -30%;
+  animation: orbit1 infinite 5s ease-in-out;
+}
+
+.image2 {
+  top: -45%;
+  left: 90%;
+  animation: orbit2 infinite 5s ease-in-out;
+}
+
+.image3 {
+  top: 100%;
+  left: -25%;
+  animation: orbit3 infinite 5s ease-in-out;
+}
+
+.image4 {
+  top: 105%;
+  left: 90%;
+  animation: orbit4 infinite 5s ease-in-out;
+}
+
+@keyframes orbit1 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(300%)
+  }
+
+  50% {
+    transform: translateX(300%) translateY(275%)
+  }
+
+  75% {
+    transform: translateX(0%) translateY(275%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit2 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(0%) translateY(275%)
+  }
+
+  50% {
+    transform: translateX(-300%) translateY(275%)
+  }
+
+  75% {
+    transform: translateX(-300%) translateY(0%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit3 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(0%) translateY(-275%)
+  }
+
+  50% {
+    transform: translateX(300%) translateY(-275%)
+  }
+
+  75% {
+    transform: translateX(300%) translateY(0%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit4 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(-300%) translateY(0%)
+  }
+
+  50% {
+    transform: translateX(-300%) translateY(-300%)
+  }
+
+  75% {
+    transform: translateX(0%) translateY(-300%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
 }
