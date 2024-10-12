@@ -91,10 +91,7 @@ def compare_image_with_instruction(user_image_path, instruction_text):
         messages=[
             {
                 "role": "user",
-                "content": f"Compare the following image description with the cooking instruction. Does the image show the correct step being performed? Answer with YES if the step is correctly performed, 
-                or NO if it's not. Don't judge too harshly and if it includes part of the requirement then mark it correct. Also always assume the best case if there are other possibilities. 
-                If the person is also in the process of doing the required step also mark it as correct.
-                Then provide feedback on what's correct and what might be missing or incorrect.\n\nImage Description: {user_image_description}\nInstruction: {instruction_text}"
+                "content": f"Compare the following image description with the cooking instruction. Does the image show the correct step being performed? Answer with YES if the step is correctly performed, or NO if it's not. Don't judge too harshly and if it includes part of the requirement then mark it correct. Also always assume the best case if there are other possibilities. If the person is also in the process of doing the required step also mark it as correct. Then provide feedback on what's correct and what might be missing or incorrect.\n\nImage Description: {user_image_description}\nInstruction: {instruction_text}"
             }
         ]
     )
