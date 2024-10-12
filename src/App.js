@@ -38,7 +38,7 @@ function App() {
           ]}
           wrapper="span"
           speed={50}
-          style={{ fontSize: '2em', display: 'inline-block', zIndex: 1 }}
+          style={{ fontSize: '2em', display: 'inline-block', zIndex: 1, backgroundColor: "rgba(255, 255, 255, 0.5)", border: "3px solid black" }}
           repeat={0}
         />
       </header>
