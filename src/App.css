@@ -12,3 +12,23 @@
   font-size: calc(10px + 5vmin);
   color: rgb(171, 171, 171);
 }
+
+.App-robot {
+  animation: App-robot-spin infinite .2s linear;
+}
+
+@keyframes App-robot-spin {
+
+  from {
+
+    transform: translateY(0);
+
+  }
+
+  to {
+
+    transform: translateY(-10%);
+
+  }
+
+}
