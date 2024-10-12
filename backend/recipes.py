@@ -4,8 +4,7 @@ import ollama
 import cv2
 import time
 
-# List of cooking instructions for a simple omelette
-instructions = [
+omelette_instructions = [
     {"instruction": "Crack 2-3 eggs into a bowl."},
     {"instruction": "Whisk the eggs until well beaten."},
     {"instruction": "Add a pinch of salt and pepper to the eggs."},
@@ -19,9 +18,33 @@ instructions = [
     {"instruction": "Slide the omelette onto a plate."}
 ]
 
-def capture_image(step_num):
+# List of cooking instructions for pancakes
+pancake_instructions = [
+    {"instruction": "In a bowl, mix 1 cup of flour, 2 tablespoons of sugar, 2 teaspoons of baking powder, and a pinch of salt."},
+    {"instruction": "In another bowl, whisk 1 cup of milk, 1 egg, and 2 tablespoons of melted butter."},
+    {"instruction": "Combine the wet ingredients with the dry ingredients and mix until just combined."},
+    {"instruction": "Heat a non-stick pan over medium heat."},
+    {"instruction": "Pour 1/4 cup of batter for each pancake onto the pan."},
+    {"instruction": "Cook until bubbles form on the surface (about 2-3 minutes)."},
+    {"instruction": "Flip the pancake and cook for another 1-2 minutes until golden brown."},
+    {"instruction": "Repeat with the remaining batter."},
+    {"instruction": "Serve with your favorite toppings like syrup or fruit."}
+]
+
+# List of cooking instructions for quesadillas
+quesadilla_instructions = [
+    {"instruction": "Heat a non-stick skillet over medium heat."},
+    {"instruction": "Place one tortilla in the skillet."},
+    {"instruction": "Sprinkle cheese and your choice of fillings (like chicken, beans, or vegetables) on half of the tortilla."},
+    {"instruction": "Fold the tortilla in half over the fillings."},
+    {"instruction": "Cook until the tortilla is golden brown and the cheese is melted (about 2-3 minutes per side)."},
+    {"instruction": "Remove from the skillet and let it cool for a minute."},
+    {"instruction": "Cut into wedges and serve with salsa or sour cream."}
+]
+
+def capture_image(step_num, recipe_name):
     """Capture an image of the user's cooking for comparison or accept a direct image path."""
-    print(f"\nStep {step_num + 1}: {instructions[step_num]['instruction']}")
+    print(f"\n{recipe_name} Step {step_num + 1}: {instructions[step_num]['instruction']}")
     print("Press 'c' to capture an image using your webcam.")
     print("Or enter the path to an existing image file.")
     print("Press 'q' to quit.")
@@ -38,7 +61,7 @@ def capture_image(step_num):
             if not ret:
                 raise IOError("Failed to capture image")
             
-            cv2.imshow("Cooking Step", frame)
+            cv2.imshow(f"{recipe_name} Cooking Step", frame)
             
             key = cv2.waitKey(1)
             if key == ord('c'):
@@ -58,14 +81,14 @@ def capture_image(step_num):
         print("Exiting program.")
         sys.exit()
     else:
-        # Assume the input is a file path
         img_path = user_input
         if not os.path.exists(img_path):
             print("File does not exist. Please try again.")
-            return capture_image(step_num)  # Recursive call to retry
+            return capture_image(step_num, recipe_name)  
         print(f"Using image: {img_path}")
 
     return img_path
+
 
 def get_image_description(image_path):
     """Get a description of the image from the API."""
@@ -98,11 +121,11 @@ def compare_image_with_instruction(user_image_path, instruction_text):
 
     return user_image_description, res["message"]["content"]
 
-def cooking_process():
+def cooking_process(instructions, recipe_name):
     """Main cooking process flow."""
     for step_num, step in enumerate(instructions):
         while True:
-            user_image_path = capture_image(step_num)
+            user_image_path = capture_image(step_num, recipe_name)
             
             user_image_description, result = compare_image_with_instruction(user_image_path, step['instruction'])
             
@@ -125,12 +148,30 @@ def cooking_process():
                     print(f"Remember: {step['instruction']}")
                     time.sleep(2)
 
-    print("\nCongratulations! You've completed all steps. Enjoy your omelette!")
-
+    print(f"\nCongratulations! You've completed all steps for the {recipe_name}. Enjoy your meal!")
 
 if __name__ == "__main__":
     print("Welcome to the Virtual Chef!")
-    print("This program will guide you through making a delicious omelette.")
+    print("This program will guide you through making delicious recipes.")
     print("Make sure you have all ingredients ready before starting.")
+    
+    print("\n1. Omelette")
+    print("2. Pancakes")
+    print("3. Quesadillas")
+    choice = input("Which recipe would you like to follow? (1/2/3): ").strip()
+    
+    if choice == '1':
+        instructions = omelette_instructions
+        recipe_name = "Omelette"
+    elif choice == '2':
+        instructions = pancake_instructions
+        recipe_name = "Pancakes"
+    elif choice == '3':
+        instructions = quesadilla_instructions
+        recipe_name = "Quesadillas"
+    else:
+        print("Invalid choice. Exiting program.")
+        sys.exit()
+    
     input("Press Enter when you're ready to begin...")
-    cooking_process()
+    cooking_process(instructions, recipe_name)
