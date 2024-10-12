@@ -22,7 +22,7 @@
         document.body.appendChild(renderer.domElement);
 
         loader = new THREE.GLTFLoader();
-        loader.load('Dinosaur.glb', function (gltf) {
+        loader.load('NONRIGGED.glb', function (gltf) {
             model = gltf.scene;
             model.position.set(0, 0, -1); // Position the model in front of the camera
             scene.add(model);
