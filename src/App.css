@@ -3,14 +3,15 @@
 }
 
 .App-header {
-  background-color: #000000;
+  background-image: url("city2.jpg");
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 5vmin);
-  color: rgb(171, 171, 171);
+  color: rgb(213, 215, 85);
 }
 
 .App-robot {

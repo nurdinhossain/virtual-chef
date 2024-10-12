@@ -1,21 +1,8 @@
 import './App.css';
 import { TypeAnimation } from 'react-type-animation';
-import { useSpring, animated } from '@react-spring/web'
 import robot from "./robot.png"
 
 function App() {
-  const [springs, api] = useSpring(() => ({
-    from: { translateY: 0 },
-    to: { translateY: -10 },
-  }));
-
-  const triggerAnimation = () => {
-    api.start({
-      from: { translateY: 0 },
-      to: { translateY: -10 },
-    });
-  };
-
   return (
     <div className="App">
       <header className="App-header">
