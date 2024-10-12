@@ -79,7 +79,7 @@ function App() {
         {dialogueStep === 0 && buttonsVisible && (
           <div>
             {recipes.map((recipe, index) => (
-              <button style={{ fontFamily: "Pixel", color: "rgb(0, 255, 106)", fontSize: '1em', display: 'inline-block', zIndex: 2, backgroundColor: "rgba(255, 255, 255, 0.5)", border: "3px solid black", margin: 10 }} key={index} onClick={() => handleRecipeClick(recipe)}>
+              <button style={{ fontFamily: "Pixel", color: "rgb(255, 0, 174)", fontSize: '1.25em', display: 'inline-block', zIndex: 2, backgroundColor: "rgba(255, 255, 255, 0.5)", border: "3px solid black", margin: 10, marginTop: 65 }} key={index} onClick={() => handleRecipeClick(recipe)}>
                 {recipe}
               </button>
             ))}
