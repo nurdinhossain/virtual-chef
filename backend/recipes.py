@@ -104,35 +104,73 @@ def get_image_description(image_path):
     )
     return res["message"]["content"]
 
+def extract_keywords(instruction_text):
+    """Extract relevant keywords from the instruction text."""
+    # This can be a simple keyword extraction based on known terms
+    keywords = []
+    
+    # Adjust the keywords based on the instruction texts
+    if "whisk" in instruction_text.lower():
+        keywords.extend(["whisk", "eggs"])
+    elif "crack" in instruction_text.lower():
+        keywords.extend(["crack", "eggs"])
+    elif "fold" in instruction_text.lower():
+        keywords.extend(["fold", "tortilla", "fillings"])
+    elif "cook" in instruction_text.lower():
+        keywords.extend(["cook", "heat", "pan", "golden brown"])
+    # Add more keywords as needed for other instructions
+    
+    return keywords
+
 def compare_image_with_instruction(user_image_path, instruction_text):
     """Compare the user's cooking image with the instruction."""
     
     user_image_description = get_image_description(user_image_path)
+    keywords = extract_keywords(instruction_text)
+
+    # Determine if the image description contains relevant keywords
+    contains_keywords = any(keyword in user_image_description.lower() for keyword in keywords)
 
     res = ollama.chat(
         model="llava:13b",
         messages=[
             {
                 "role": "user",
-                "content": f"Compare the following image description with the cooking instruction. Does the image show the correct step being performed? Answer with YES if the step is correctly performed, or NO if it's not. Don't judge too harshly and if it includes part of the requirement then mark it correct. Also always assume the best case if there are other possibilities. If the person is also in the process of doing the required step also mark it as correct. Then provide feedback on what's correct and what might be missing or incorrect.\n\nImage Description: {user_image_description}\nInstruction: {instruction_text}"
+                "content": (
+                    f"Does the image show the correct cooking step being performed? "
+                    f"Focus on the main activity and any ingredients that should be visible. "
+                    f"Instruction: {instruction_text} "
+                    f"Image Description: {user_image_description}"
+                )
             }
         ]
     )
 
-    return user_image_description, res["message"]["content"]
+    ai_feedback = res["message"]["content"]
+    
+    # Analyze AI feedback and determine overall correctness
+    if "yes" in ai_feedback.lower() or contains_keywords:
+        result = "YES"
+        feedback = "The step appears to be performed correctly based on the image."
+    else:
+        result = "NO"
+        feedback = "The step was not completed correctly. Please check the instruction again."
 
+    return user_image_description, result, feedback
+
+# Example usage in the cooking_process function
 def cooking_process(instructions, recipe_name):
     """Main cooking process flow."""
     for step_num, step in enumerate(instructions):
         while True:
             user_image_path = capture_image(step_num, recipe_name)
             
-            user_image_description, result = compare_image_with_instruction(user_image_path, step['instruction'])
+            user_image_description, result, feedback = compare_image_with_instruction(user_image_path, step['instruction'])
             
             print(f"\nUser Image Description: {user_image_description}")
-            print(f"AI Feedback: {result}")
+            print(f"AI Feedback: {feedback}")
             
-            if result.strip().upper().startswith("YES"):
+            if result.strip().upper() == "YES":
                 print(f"Great job! Step {step_num + 1} complete. Moving to the next step.")
                 time.sleep(2)  # Pause to let the user read the feedback
                 break
