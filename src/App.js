@@ -19,12 +19,24 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img class="App-robot" src={robot} width="15%" alt="Robot" />
+        <img id="robot" src={robot} width="15%" alt="Robot" />
         <TypeAnimation
           sequence={[
+            () => {
+              document.getElementById("robot").classList.add("App-robot")
+            },
             '> Welcome to Virtual Chef.',
+            () => {
+              document.getElementById("robot").classList.remove("App-robot")
+            },
             2000,
+            () => {
+              document.getElementById("robot").classList.add("App-robot")
+            },
             '> Please choose a recipe.',
+            () => {
+              document.getElementById("robot").classList.remove("App-robot")
+            },
             2000
           ]}
           wrapper="span"
