@@ -2,6 +2,7 @@ import './App.css';
 import { TypeAnimation } from 'react-type-animation';
 import { useState } from 'react';
 import Webcam from "react-webcam";
+import React from 'react';
 import robot from "./robot.png"
 import burger from "./burger.png"
 import hotDog from "./hot-dog.png"
@@ -16,6 +17,18 @@ function App() {
   const [recipeInstructions, setRecipeInstructions] = useState([]);
   const [currentInstruction, setCurrentInstruction] = useState(0);
   const recipes = ["pancakes", "quesadillas", "omelette"];
+
+  const webcamRef = React.createRef(null);
+
+  const captureScreenshot = React.useCallback(() => {
+    const imageSrc = webcamRef.current.getScreenshot();
+    const link = document.createElement('a');
+    link.href = imageSrc;
+    link.download = `VirtualChefScreenshot.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }, [webcamRef]);
 
   const handleRecipeClick = (recipe) => {
     setSelectedRecipe(recipe);
@@ -72,6 +85,32 @@ function App() {
     ]
   ];
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('http://127.0.0.1:5000/compare', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipe: selectedRecipe,
+          instruction: recipeInstructions[currentInstruction],
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const data = await response.json();
+      console.log(data.result);
+      console.log(data.feedback);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
+
   return (
     <div className="App">
       <header className="App-header">
@@ -114,13 +153,14 @@ function App() {
                 width: "50%"
               }}
             >
-              <Webcam style={{ border: "3px solid black", width: "75%" }} />
+              <Webcam style={{ border: "3px solid black", width: "75%" }} ref={webcamRef} />
               <div style={{ backgroundColor: "purple", border: "3px solid black" }}>
                 <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{currentInstruction + 1}. {recipeInstructions[currentInstruction]}</p>
-                {currentInstruction != recipeInstructions.length - 1 && <div 
-                  style={{ border: "3px solid black", backgroundColor: 'forestGreen', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10 }} 
-                  onClick={() => {
-                    console.log("afeef has big boobies");
+                {currentInstruction != recipeInstructions.length - 1 && <div
+                  style={{ border: "3px solid black", backgroundColor: 'forestGreen', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10 }}
+                  onClick={(e) => {
+                    captureScreenshot();
+                    handleSubmit(e);
                     if (currentInstruction < recipeInstructions.length - 1) {
                       setCurrentInstruction(currentInstruction + 1);
                     }

@@ -103,7 +103,7 @@ def get_recipe(name):
 @app.route('/compare', methods=['POST'])
 def compare_image():
     data = request.json
-    image_url = data.get('image_url')
+    image_url = "https://startcooking.com/public/images/IMGP2110.JPG"
     recipe = data.get('recipe')
     instruction = data.get('instruction')
     
