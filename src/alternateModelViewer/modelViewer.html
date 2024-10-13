@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Viewer</title>
+    <!-- Include the model-viewer script -->
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+    <style>
+        /* Optional: Add some basic styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #000000;
+        }
+        model-viewer {
+            width: 100%;
+            max-width: 600px;
+            height: 400px;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Use the model-viewer tag to display a 3D model -->
+<model-viewer
+        src="C:\Users\Imran\IdeaProjects\virtual-chef\src\alternateModelViewer\PROPERLYRIGGED.glb"
+        ios-src="path/to/your/model.usdz"
+        alt="A 3D model description"
+        ar
+        auto-rotate
+        camera-controls>
+</model-viewer>
+
+</body>
+</html>
