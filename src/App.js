@@ -174,6 +174,18 @@ function App() {
                 >
                   (Click to verify completion.)
                 </div>}
+                {currentInstruction != recipeInstructions.length - 1 && <div
+                  style={{ border: "3px solid black", backgroundColor: 'blue', marginBottom: 10, color: 'red', WebkitTextStrokeColor: 'red', fontSize: '30px', marginLeft: 10, marginRight: 10 }}
+                  onClick={(e) => {
+                    if (currentInstruction < recipeInstructions.length - 1) {
+                      setCurrentInstruction(currentInstruction + 1);
+                      setResult(true);
+                      setFeedback(null);
+                    }
+                  }}
+                >
+                  (Move forward anyways.)
+                </div>}
               </div>
             </div>
           )
