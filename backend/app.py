@@ -29,7 +29,7 @@ omelette_instructions = [
     {"instruction": "Add your chosen fillings to one half of the omelette."},
     {"instruction": "Fold the other half of the omelette over the fillings."},
     {"instruction": "Cook for another minute until the cheese melts (if used)."},
-    {"instruction": "Slide the omelette onto a plate."}
+    {"instruction": "Use spatula to move omelette from pan to plate."}
 ]
 
 pancake_instructions = [
