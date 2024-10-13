@@ -1,13 +1,14 @@
 import os
-import sys
-import ollama
 import cv2
-import time
 import re
 from flask import Flask, request, jsonify
+from huggingface_hub import InferenceClient
+from infer import analyze_image
 
+# Set up app and inference client
 app = Flask(__name__)
-app.config['APP_NAME'] = 'SousChef API'
+app.config['APP_NAME'] = 'VirtualChef API'
+client = InferenceClient(api_key=os.getenv("HUGGING_KEY"))
 
 # Configuration
 UPLOAD_FOLDER = 'uploads'
@@ -70,65 +71,13 @@ def secure_filename(filename):
     filename = re.sub(r'\.+', '.', filename)
     return filename.strip('.')
 
-def get_image_description(image_path):
-    """Get a description of the image from the API."""
-    res = ollama.chat(
-        model="llava:13b",
-        messages=[
-            {
-                "role": "user",
-                "content": f"Describe the contents of the image, focusing on the cooking activity and ingredients visible.",
-                "images": [image_path]
-            }
-        ]
-    )
-    return res["message"]["content"]
-
-def extract_keywords(instruction_text):
-    """Extract relevant keywords from the instruction text."""
-    keywords = []
-    if "whisk" in instruction_text.lower():
-        keywords.extend(["whisk", "eggs"])
-    elif "crack" in instruction_text.lower():
-        keywords.extend(["crack", "eggs"])
-    elif "fold" in instruction_text.lower():
-        keywords.extend(["fold", "tortilla", "fillings"])
-    elif "cook" in instruction_text.lower():
-        keywords.extend(["cook", "heat", "pan", "golden brown"])
-    return keywords
-
-def compare_image_with_instruction(user_image_path, instruction_text):
+def compare_image_with_instruction(user_image_url, recipe, instruction_text):
     """Compare the user's cooking image with the instruction."""
-    user_image_description = get_image_description(user_image_path)
-    keywords = extract_keywords(instruction_text)
-
-    contains_keywords = any(keyword in user_image_description.lower() for keyword in keywords)
-
-    res = ollama.chat(
-        model="llava:13b",
-        messages=[
-            {
-                "role": "user",
-                "content": (
-                    f"Does the image show the correct cooking step being performed? "
-                    f"Focus on the main activity and any ingredients that should be visible. "
-                    f"Instruction: {instruction_text} "
-                    f"Image Description: {user_image_description}"
-                )
-            }
-        ]
-    )
-
-    ai_feedback = res["message"]["content"]
-    
-    if "yes" in ai_feedback.lower() or contains_keywords:
-        result = "YES"
-        feedback = "The step appears to be performed correctly based on the image."
+    response = analyze_image(client, user_image_url, "I was told to complete this step while cooking {}: {}. This image is my result. If I successfully completed this step, simply output 'Yes'. If I did not, only describe what I did incorrectly.".format(recipe, instruction_text))
+    if response == "Yes":
+        return True, "Good job!"
     else:
-        result = "NO"
-        feedback = "The step was not completed correctly. Please check the instruction again."
-
-    return user_image_description, result, feedback
+        return False, response
 
 @app.route('/')
 def home():
@@ -142,40 +91,30 @@ def home():
 def get_recipes():
     return jsonify(list(recipes.keys()))
 
-@app.route('/recipe/<name>', methods=['GET'])
+@app.route('/recipes/<name>', methods=['GET'])
 def get_recipe(name):
     if name in recipes:
         return jsonify(recipes[name])
     else:
         return jsonify({"error": "Recipe not found"}), 404
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
-        return jsonify({"message": "File uploaded successfully", "path": file_path})
-    return jsonify({"error": "File type not allowed"}), 400
-
 @app.route('/compare', methods=['POST'])
 def compare_image():
     data = request.json
-    image_path = data.get('image_path')
+    image_url = data.get('image_url')
+    recipe = data.get('recipe')
     instruction = data.get('instruction')
     
-    if not image_path or not instruction:
-        return jsonify({"error": "Missing image_path or instruction"}), 400
+    if not image_url:
+        return jsonify({"error": "Missing image_url"}), 400
+    if not recipe:
+        return jsonify({"error": "Missing recipe"}), 400
+    if not instruction:
+        return jsonify({"error": "Missing instruction"}), 400
     
-    user_image_description, result, feedback = compare_image_with_instruction(image_path, instruction)
+    result, feedback = compare_image_with_instruction(image_url, recipe, instruction)
     
     return jsonify({
-        "user_image_description": user_image_description,
         "result": result,
         "feedback": feedback
     })
