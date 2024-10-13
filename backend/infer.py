@@ -8,6 +8,7 @@ image_url = "https://thedeliciousspoon.com/french-toast-pancakes/pancake-process
 
 def analyze_image(client, img_url, prompt):
     result = ""
+    print(prompt)
     for message in client.chat_completion(
         model="meta-llama/Llama-3.2-11B-Vision-Instruct",
         messages=[

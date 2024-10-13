@@ -1,6 +1,6 @@
 import './App.css';
 import { TypeAnimation } from 'react-type-animation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Webcam from "react-webcam";
 import React from 'react';
 import robot from "./robot.png"
@@ -113,6 +113,13 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (result === true && currentInstruction < recipeInstructions.length - 1) {
+      setCurrentInstruction(currentInstruction + 1);
+      setResult(null); // Reset result to prevent infinite loop
+    }
+  }, [result, currentInstruction, recipeInstructions]);
+
   return (
     <div className="App">
       <header className="App-header">
@@ -164,12 +171,6 @@ function App() {
                   onClick={(e) => {
                     captureScreenshot();
                     handleSubmit(e);
-
-                    if (result) {
-                      if (currentInstruction < recipeInstructions.length - 1) {
-                        setCurrentInstruction(currentInstruction + 1);
-                      }
-                    }
                   }}
                 >
                   (Click to verify completion.)

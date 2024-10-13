@@ -77,8 +77,8 @@ def secure_filename(filename):
 
 def compare_image_with_instruction(user_image_url, recipe, instruction_text):
     """Compare the user's cooking image with the instruction."""
-    response = analyze_image(client, user_image_url, "I was told to complete this step while cooking {}: {}. This image is my result. If I successfully completed this step, simply output 'Yes'. If I did not, BRIEFLY describe what I did incorrectly.".format(recipe, instruction_text))
-    if response == "Yes":
+    response = analyze_image(client, user_image_url, "For {}: {}. This image is my result. If completed, only output 'Yes'. If not, BRIEFLY describe what is incorrect.".format(recipe, instruction_text))
+    if "Yes" in response:
         return True, "Good job!"
     else:
         return False, response
@@ -133,7 +133,7 @@ def compare_image():
     response = requests.post(url, headers=headers, data={"image": base64_data})
     print(response.json())
     url = response.json()["data"]["link"]
-    
+    print(url)
     result, feedback = compare_image_with_instruction(url, recipe, instruction)
     os.remove(img_path)
     
