@@ -19,7 +19,7 @@ def analyze_image(client, img_url, prompt):
                 ],
             }
         ],
-        max_tokens=500,
+        max_tokens=100,
         stream=True,
     ):
         result += message.choices[0].delta.content

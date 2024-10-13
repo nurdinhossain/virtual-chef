@@ -26,7 +26,7 @@ function App() {
     const imageSrc = webcamRef.current.getScreenshot();
     const link = document.createElement('a');
     link.href = imageSrc;
-    link.download = `VirtualChefScreenshot.jpg`;
+    link.download = `VirtualChefScreenshot.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -155,7 +155,7 @@ function App() {
                 width: "50%"
               }}
             >
-              <Webcam style={{ border: "3px solid black", width: "75%" }} ref={webcamRef} />
+              <Webcam style={{ border: "3px solid black", width: "75%" }} ref={webcamRef} screenshotFormat="image/png" />
               <div style={{ backgroundColor: "purple", border: "3px solid black" }}>
                 <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{currentInstruction + 1}. {recipeInstructions[currentInstruction]}</p>
                 <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{feedback}</p>
