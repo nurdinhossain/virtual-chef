@@ -61,11 +61,12 @@ function App() {
       async () => {
         // hide robot and food
         setRobot(false);
-        
+
         // fetch recipe from flask server
         const response = await fetch(`http://127.0.0.1:5000/recipes/${selectedRecipe}`);
         const data = await response.json();
         const simpleInstructions = data.map(item => item.instruction);
+        simpleInstructions.push("Nice work!");
         setRecipeInstructions(simpleInstructions);
       }
     ]
@@ -113,10 +114,20 @@ function App() {
                 width: "50%"
               }}
             >
-              <Webcam style={{border: "3px solid black", width: "75%"}} />
-              <div style={{backgroundColor: "purple", border: "3px solid black"}}>
-                <p style={{fontSize: '30px', marginLeft: 10, marginRight: 10}}>{currentInstruction+1}. {recipeInstructions[currentInstruction]}</p>
-                <div style={{border: "3px solid black", backgroundColor: 'white', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10}}>(Click to verify completion.)</div>
+              <Webcam style={{ border: "3px solid black", width: "75%" }} />
+              <div style={{ backgroundColor: "purple", border: "3px solid black" }}>
+                <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{currentInstruction + 1}. {recipeInstructions[currentInstruction]}</p>
+                {currentInstruction != recipeInstructions.length - 1 && <div 
+                  style={{ border: "3px solid black", backgroundColor: 'forestGreen', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10 }} 
+                  onClick={() => {
+                    console.log("afeef has big boobies");
+                    if (currentInstruction < recipeInstructions.length - 1) {
+                      setCurrentInstruction(currentInstruction + 1);
+                    }
+                  }}
+                >
+                  (Click to verify completion.)
+                </div>}
               </div>
             </div>
           )
