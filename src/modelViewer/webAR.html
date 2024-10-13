@@ -12,79 +12,71 @@
     <a-marker preset="hiro">
         <a-entity
                 id="animated-model"
-                gltf-model="NONRIGGED.glb"
+                gltf-model="animation1test.glb"
                 scale="1 1 1"
                 position="0 0 0"
-                rotation="90 180 90"
-                animation-mixer="clip: *; loop: repeat; clampWhenFinished: true;">
+                rotation="90 180 90">
         </a-entity>
     </a-marker>
     <a-entity camera></a-entity>
 </a-scene>
 
 <div style="position: absolute; bottom: 10px; left: 10px; z-index: 999;">
-    <button id="button1">Break Eggs</button>
-    <button id="button2">Pour Egg Mixture</button>
-    <button id="button3">Serve Omelette</button>
+    <button id="button1">Animation 1</button>
+    <button id="button2">Animation 2</button>
+    <button id="button3">Animation 3</button>
 </div>
 
 <script>
     const animatedModel = document.querySelector('#animated-model');
+    let animations = [];
+    let currentAnimation = null;
 
-    // Breaking eggs animation
-    // Breaking eggs animation
-    function breakEggs() {
-        // Step 1: Move up slightly
-        animatedModel.setAttribute('animation__step1', {
-            property: 'position',
-            to: '2 0 0',
-            dur: 300,
-            easing: 'easeOutQuad'
-        });
+    animatedModel.addEventListener('model-loaded', function() {
+        console.log('Model loaded');
+        animations = animatedModel.getObject3D('mesh').animations;
+        console.log('Available animations:', animations.map((a, index) => `${index}: ${a.name}`));
+    });
 
-        // Step 2: Rotate 90 degrees forward
-        setTimeout(() => {
-            animatedModel.setAttribute('animation__step2', {
-                property: 'rotation',
-                to: '0 -45 0',
-                dur: 500,
-                easing: 'easeInOutQuad'
-            });
-        }, 300);
+    function playAnimation(index) {
+        if (index < animations.length) {
+            const clipName = animations[index].name;
+            console.log(`Playing animation: ${clipName}`);
 
-        // Step 3: Return to normal standing position
-        setTimeout(() => {
-            animatedModel.setAttribute('animation__step3', {
-                property: 'position',
-                to: '0 0 0',
-                dur: 300,
-                easing: 'easeInQuad'
+            // Remove any existing animation-mixer
+            animatedModel.removeAttribute('animation-mixer');
+
+            // Add new animation-mixer with the selected clip
+            animatedModel.setAttribute('animation-mixer', {
+                clip: clipName,
+                loop: 'repeat',
+                clampWhenFinished: true,
+                timeScale: 1
             });
-            animatedModel.setAttribute('animation__step4', {
-                property: 'rotation',
-                to: '90 180 90',
-                dur: 500,
-                easing: 'easeInOutQuad'
-            });
-        }, 800);
-    }
-//50 180 90
-    // Pouring egg mixture animation
-    function pourEggMixture() {
-        animatedModel.setAttribute('animation__position', 'property: position; to: 0 0 0; dur: 500; dir: alternate; loop: false');
-        animatedModel.setAttribute('animation__rotation', 'property: rotation; to: 0 90 0; dur: 1000; dir: alternate; loop: false');
+
+            currentAnimation = clipName;
+
+            // Stop the animation after it completes one cycle
+            const duration = animations[index].duration * 1000; // Convert to milliseconds
+            setTimeout(() => {
+                if (currentAnimation === clipName) {
+                    stopAnimation();
+                }
+            }, duration);
+        } else {
+            console.log(`Animation index ${index} not found`);
+        }
     }
 
-    // Serving omelette animation
-    function serveOmelette() {
-        animatedModel.setAttribute('animation__position1', 'property: position; to: 0 1 0; dur: 500; dir: alternate; loop: false');
-        animatedModel.setAttribute('animation__position2', 'property: position; to: 0 1.5 0; dur: 700; dir: alternate; loop: false; delay: 500');
+    function stopAnimation() {
+        animatedModel.removeAttribute('animation-mixer');
+        currentAnimation = null;
     }
 
     // Set up button listeners
-    document.getElementById('button1').addEventListener('click', breakEggs);
-    document.getElementById('button2').addEventListener('click', pourEggMixture);
-    document.getElementById('button3').addEventListener('click', serveOmelette);
+    document.getElementById('button1').addEventListener('click', () => playAnimation(0));
+    document.getElementById('button2').addEventListener('click', () => playAnimation(1));
+    document.getElementById('button3').addEventListener('click', () => playAnimation(2));
 </script>
 </body>
 </html>
