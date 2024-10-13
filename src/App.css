@@ -2,37 +2,155 @@
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
-  background-color: #282c34;
+  background-image: url("city2.jpg");
+  background-size: cover;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  font-size: calc(10px + 5vmin);
+  color: rgb(255, 0, 174);
 }
 
-.App-link {
-  color: #61dafb;
+.App-robot {
+  animation: App-robot-jump infinite .2s linear;
 }
 
-@keyframes App-logo-spin {
+@keyframes App-robot-jump {
+
   from {
-    transform: rotate(0deg);
+
+    transform: translateY(0);
+
   }
+
   to {
-    transform: rotate(360deg);
+
+    transform: translateY(-10%);
+
+  }
+
+}
+
+.robot-container {
+  position: relative;
+}
+
+.orbiting-image {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.image1 {
+  top: -45%;
+  left: -30%;
+  animation: orbit1 infinite 5s ease-in-out;
+}
+
+.image2 {
+  top: -45%;
+  left: 90%;
+  animation: orbit2 infinite 5s ease-in-out;
+}
+
+.image3 {
+  top: 100%;
+  left: -25%;
+  animation: orbit3 infinite 5s ease-in-out;
+}
+
+.image4 {
+  top: 105%;
+  left: 90%;
+  animation: orbit4 infinite 5s ease-in-out;
+}
+
+@keyframes orbit1 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(300%)
+  }
+
+  50% {
+    transform: translateX(300%) translateY(275%)
+  }
+
+  75% {
+    transform: translateX(0%) translateY(275%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit2 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(0%) translateY(275%)
+  }
+
+  50% {
+    transform: translateX(-300%) translateY(275%)
+  }
+
+  75% {
+    transform: translateX(-300%) translateY(0%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit3 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(0%) translateY(-275%)
+  }
+
+  50% {
+    transform: translateX(300%) translateY(-275%)
+  }
+
+  75% {
+    transform: translateX(300%) translateY(0%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
+  }
+}
+
+@keyframes orbit4 {
+  0% {
+    transform: translateX(0%) 
+  }
+
+  25% {
+    transform: translateX(-300%) translateY(0%)
+  }
+
+  50% {
+    transform: translateX(-300%) translateY(-300%)
+  }
+
+  75% {
+    transform: translateX(0%) translateY(-300%)
+  }
+
+  100% {
+    transform: translateX(0%) translateY(0%)
   }
 }
