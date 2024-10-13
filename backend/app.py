@@ -2,12 +2,14 @@ import os
 import cv2
 import re
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from huggingface_hub import InferenceClient
 from infer import analyze_image
 
 # Set up app and inference client
 app = Flask(__name__)
 app.config['APP_NAME'] = 'VirtualChef API'
+cors = CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 client = InferenceClient(api_key=os.getenv("HUGGING_KEY"))
 
 # Configuration

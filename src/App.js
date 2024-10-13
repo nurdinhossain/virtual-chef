@@ -13,6 +13,8 @@ function App() {
   const [buttonsVisible, setButtons] = useState(false);
   const [dialogueStep, setDialogueStep] = useState(0);
   const [selectedRecipe, setSelectedRecipe] = useState(null);
+  const [recipeInstructions, setRecipeInstructions] = useState([]);
+  const [currentInstruction, setCurrentInstruction] = useState(0);
   const recipes = ["pancakes", "quesadillas", "omelette"];
 
   const handleRecipeClick = (recipe) => {
@@ -56,7 +58,16 @@ function App() {
       () => {
         document.getElementById("robot").classList.remove("App-robot")
       },
-      () => setRobot(false)
+      async () => {
+        // hide robot and food
+        setRobot(false);
+        
+        // fetch recipe from flask server
+        const response = await fetch(`http://127.0.0.1:5000/recipes/${selectedRecipe}`);
+        const data = await response.json();
+        const simpleInstructions = data.map(item => item.instruction);
+        setRecipeInstructions(simpleInstructions);
+      }
     ]
   ];
 
@@ -95,10 +106,18 @@ function App() {
                 marginTop: 20,
                 backgroundColor: 'rgb(255, 0, 174)',
                 border: "3px solid black",
-                boxShadow: "10px 10px 5px rgba(0, 0, 0, 0.5)" // Add this line for a shadow effect
+                boxShadow: "10px 10px 5px rgba(0, 0, 0, 0.5)", // Add this line for a shadow effect
+                fontFamily: 'Pixelify Sans',
+                WebkitTextStrokeColor: 'gold',
+                color: 'gold',
+                width: "50%"
               }}
             >
-              <Webcam />
+              <Webcam style={{border: "3px solid black", width: "75%"}} />
+              <div style={{backgroundColor: "purple", border: "3px solid black"}}>
+                <p style={{fontSize: '30px', marginLeft: 10, marginRight: 10}}>{currentInstruction+1}. {recipeInstructions[currentInstruction]}</p>
+                <div style={{border: "3px solid black", backgroundColor: 'white', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10}}>(Click to verify completion.)</div>
+              </div>
             </div>
           )
         }
