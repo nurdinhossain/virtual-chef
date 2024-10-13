@@ -5,5 +5,13 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+<<<<<<< HEAD
+=======
+    <orderEntry type="library" name="three" level="application" />
+    <orderEntry type="library" name="three.js" level="application" />
+    <orderEntry type="library" name="aframe" level="application" />
+    <orderEntry type="library" name="aframe-ar" level="application" />
+    <orderEntry type="library" name="aframe-extras" level="application" />
+>>>>>>> armodelViewer
   </component>
 </module>

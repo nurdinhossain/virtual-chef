@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AR.js Multi-Marker Continuous Animations</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+<a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+    <a-marker type="pattern" url="pattern-1.patt"
+              smooth="true"
+              smoothCount="10"
+              smoothTolerance="0.01"
+              smoothThreshold="5">
+        <a-entity
+                id="animated-model-1"
+                gltf-model="step1eggs.glb"
+                scale="1.5 1.5 1.5"
+                position="0 0 5"
+                rotation="90 180 0"
+                animation-mixer="loop: repeat; timeScale: 1">
+        </a-entity>
+    </a-marker>
+
+    <a-marker type="pattern" url="pattern-2.patt"
+              smooth="true"
+              smoothCount="10"
+              smoothTolerance="0.01"
+              smoothThreshold="5">
+        <a-entity
+                id="animated-model-2"
+                gltf-model="whiskingstep2.glb"
+                scale="1.5 1.5 1.5"
+                position="0 0 5"
+                rotation="90 180 0"
+                animation-mixer="loop: repeat; timeScale: 1">
+        </a-entity>
+    </a-marker>
+
+    <a-marker type="pattern" url="pattern-3.patt"
+              smooth="true"
+              smoothCount="10"
+              smoothTolerance="0.01"
+              smoothThreshold="5">
+        <a-entity
+                id="animated-model-3"
+                gltf-model="spatulastep3.glb"
+                scale="1.5 1.5 1.5"
+                position="0 0 5"
+                rotation="90 180 0"
+                animation-mixer="loop: repeat; timeScale: 1">
+        </a-entity>
+    </a-marker>
+
+    <a-entity camera></a-entity>
+</a-scene>
+
+<script>
+    const animatedModel1 = document.querySelector('#animated-model-1');
+    const animatedModel2 = document.querySelector('#animated-model-2');
+    const animatedModel3 = document.querySelector('#animated-model-3');
+
+    function setupModelListeners(model) {
+        model.addEventListener('model-loaded', function() {
+            console.log('Model loaded');
+            const animations = model.getObject3D('mesh').animations;
+            console.log('Available animations:', animations.map((a, index) => `${index}: ${a.name}`));
+
+            // Start the animation immediately after the model is loaded
+            if (animations.length > 0) {
+                model.setAttribute('animation-mixer', {
+                    clip: animations[0].name,
+                    loop: 'repeat'
+                });
+            }
+        });
+    }
+
+    setupModelListeners(animatedModel1);
+    setupModelListeners(animatedModel2);
+    setupModelListeners(animatedModel3);
+</script>
+</body>
+</html>
