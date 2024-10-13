@@ -1,0 +1,6 @@
+# Note: Ensure that Ollama is installed before running this project.
+
+opencv-python
+ollama
+numpy
+flask
