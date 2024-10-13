@@ -1,10 +1,16 @@
 import os
-import cv2
 import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
 from huggingface_hub import InferenceClient
+from googleapiclient.http import MediaFileUpload
 from infer import analyze_image
+import pickle
+import os.path
+import time 
 
 # Set up app and inference client
 app = Flask(__name__)
@@ -62,6 +68,42 @@ recipes = {
     "quesadillas": quesadilla_instructions
 }
 
+SCOPES = ['https://www.googleapis.com/auth/drive']
+
+def upload_to_drive(img_path):
+    """Uploads a file to Google Drive using OAuth credentials."""
+    creds = None
+    # The file token.pickle stores the user's access and refresh tokens, and is
+    # created automatically when the authorization flow completes for the first
+    # time.
+    if os.path.exists('token.pickle'):
+        with open('token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+    # If there are no (valid) credentials available, let the user log in.
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'credentials.json', SCOPES)
+            creds = flow.run_local_server(port=0)
+        # Save the credentials for the next run
+        with open('token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    service = build('drive', 'v3', credentials=creds)
+
+    file_metadata = {'name': os.path.basename(img_path), 'mimeType': 'image/jpeg'}
+    media = MediaFileUpload(img_path, mimetype='image/jpeg')
+    file = service.files().create(body=file_metadata,
+                                    media_body=media,
+                                    fields='id, webViewLink').execute()
+
+    print('File ID: %s' % file.get('id'))
+    print('File URL: %s' % file.get('webViewLink'))
+
+    return file.get('webViewLink')
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -103,18 +145,26 @@ def get_recipe(name):
 @app.route('/compare', methods=['POST'])
 def compare_image():
     data = request.json
-    image_url = "https://startcooking.com/public/images/IMGP2110.JPG"
     recipe = data.get('recipe')
     instruction = data.get('instruction')
     
-    if not image_url:
-        return jsonify({"error": "Missing image_url"}), 400
     if not recipe:
         return jsonify({"error": "Missing recipe"}), 400
     if not instruction:
         return jsonify({"error": "Missing instruction"}), 400
     
-    result, feedback = compare_image_with_instruction(image_url, recipe, instruction)
+    # Local screenshot path
+    img_path = "C:\\Users\\rhoss\\Downloads\\VirtualChefScreenshot.jpg"
+    while not os.path.exists(img_path):
+        time.sleep(0.1)
+    
+    # Upload screenshot to Google Drive and get public URL
+    image_url = upload_to_drive(img_path)
+    new_url = "https://drive.usercontent.google.com/download?id=" + image_url.split("/d/")[1].split("/")[0]
+    print(new_url)
+    
+    result, feedback = compare_image_with_instruction(new_url, recipe, instruction)
+    os.remove(img_path)
     
     return jsonify({
         "result": result,

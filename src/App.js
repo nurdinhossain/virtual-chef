@@ -16,6 +16,8 @@ function App() {
   const [selectedRecipe, setSelectedRecipe] = useState(null);
   const [recipeInstructions, setRecipeInstructions] = useState([]);
   const [currentInstruction, setCurrentInstruction] = useState(0);
+  const [result, setResult] = useState(null);
+  const [feedback, setFeedback] = useState(null);
   const recipes = ["pancakes", "quesadillas", "omelette"];
 
   const webcamRef = React.createRef(null);
@@ -104,8 +106,8 @@ function App() {
       }
 
       const data = await response.json();
-      console.log(data.result);
-      console.log(data.feedback);
+      setResult(data.result);
+      setFeedback(data.feedback);
     } catch (error) {
       console.error('Error:', error);
     }
@@ -156,13 +158,17 @@ function App() {
               <Webcam style={{ border: "3px solid black", width: "75%" }} ref={webcamRef} />
               <div style={{ backgroundColor: "purple", border: "3px solid black" }}>
                 <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{currentInstruction + 1}. {recipeInstructions[currentInstruction]}</p>
+                <p style={{ fontSize: '30px', marginLeft: 10, marginRight: 10 }}>{feedback}</p>
                 {currentInstruction != recipeInstructions.length - 1 && <div
                   style={{ border: "3px solid black", backgroundColor: 'forestGreen', marginBottom: 10, color: 'lime', WebkitTextStrokeColor: 'lime', fontSize: '30px', marginLeft: 10, marginRight: 10 }}
                   onClick={(e) => {
                     captureScreenshot();
                     handleSubmit(e);
-                    if (currentInstruction < recipeInstructions.length - 1) {
-                      setCurrentInstruction(currentInstruction + 1);
+
+                    if (result) {
+                      if (currentInstruction < recipeInstructions.length - 1) {
+                        setCurrentInstruction(currentInstruction + 1);
+                      }
                     }
                   }}
                 >
