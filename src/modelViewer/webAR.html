@@ -12,10 +12,10 @@
     <a-marker preset="hiro">
         <a-entity
                 id="animated-model"
-                gltf-model="PROPERLYRIGGED.bvh"
+                gltf-model="NONRIGGED.glb"
                 scale="1 1 1"
                 position="0 0 0"
-                rotation="0 90 0"
+                rotation="90 180 90"
                 animation-mixer="clip: *; loop: repeat; clampWhenFinished: true;">
         </a-entity>
     </a-marker>
@@ -32,14 +32,46 @@
     const animatedModel = document.querySelector('#animated-model');
 
     // Breaking eggs animation
+    // Breaking eggs animation
     function breakEggs() {
-        animatedModel.setAttribute('animation__position', 'property: position; to: 0 0.5 0; dur: 500; dir: alternate; loop: false');
-        animatedModel.setAttribute('animation__rotation', 'property: rotation; to: 0 180 0; dur: 1000; dir: alternate; loop: false');
-    }
+        // Step 1: Move up slightly
+        animatedModel.setAttribute('animation__step1', {
+            property: 'position',
+            to: '2 0 0',
+            dur: 300,
+            easing: 'easeOutQuad'
+        });
 
+        // Step 2: Rotate 90 degrees forward
+        setTimeout(() => {
+            animatedModel.setAttribute('animation__step2', {
+                property: 'rotation',
+                to: '0 -45 0',
+                dur: 500,
+                easing: 'easeInOutQuad'
+            });
+        }, 300);
+
+        // Step 3: Return to normal standing position
+        setTimeout(() => {
+            animatedModel.setAttribute('animation__step3', {
+                property: 'position',
+                to: '0 0 0',
+                dur: 300,
+                easing: 'easeInQuad'
+            });
+            animatedModel.setAttribute('animation__step4', {
+                property: 'rotation',
+                to: '90 180 90',
+                dur: 500,
+                easing: 'easeInOutQuad'
+            });
+        }, 800);
+    }
+//50 180 90
     // Pouring egg mixture animation
     function pourEggMixture() {
-        animatedModel.setAttribute('animation__position', 'property: position; to: 0 -0.5 0; dur: 500; dir: alternate; loop: false');
+        animatedModel.setAttribute('animation__position', 'property: position; to: 0 0 0; dur: 500; dir: alternate; loop: false');
         animatedModel.setAttribute('animation__rotation', 'property: rotation; to: 0 90 0; dur: 1000; dir: alternate; loop: false');
     }
 
